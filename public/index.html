@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>终末地解密工具 · 浮空气球 &amp; 源石电路</title>
+<meta name="description" content="《明日方舟：终末地》解密辅助工具：浮空气球平衡摆放（截图自动识别）、设备修复源石电路（109 道官方关卡一键求解）。全部计算在浏览器本地完成。">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='4' y='4' width='11' height='11' rx='2' fill='%2397e04c'/><rect x='17' y='4' width='11' height='11' rx='2' fill='%2352b7ff'/><rect x='4' y='17' width='11' height='11' rx='2' fill='%23e8b23a'/><rect x='17' y='17' width='11' height='11' rx='2' fill='%235a6470'/></svg>">
+</head>
+<body data-mode="balloon">
+  <!-- 顶部：模式切换（电路在前）+ 设置 -->
+  <nav id="mode-tabs" aria-label="工具模式">
+    <button type="button" class="mode-tab" data-mode="circuit">🧩 设备修复 · 源石电路</button>
+    <button type="button" class="mode-tab active" data-mode="balloon">🎈 浮空气球</button>
+    <span class="tabs-divider" aria-hidden="true"></span>
+    <button type="button" id="settings-btn" aria-label="设置" title="设置">⚙</button>
+    <div id="settings-pop" hidden>
+      <div class="set-label">主题配色</div>
+      <div id="theme-row" class="theme-row" role="group" aria-label="选择主题配色"></div>
+    </div>
+  </nav>
+
+  <!-- ===================== 页面一：浮空气球 ===================== -->
+  <div id="page-balloon">
+  <div id="app" class="app-grid">
+    <!-- 左侧：任务与工具面板 -->
+    <aside class="panel left-panel">
+      <div class="mission-header">
+        <div class="mission-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26"><circle cx="9" cy="9" r="5" fill="#e6e9ee"/><circle cx="16.5" cy="9" r="5" fill="#e6e9ee"/><rect x="7" y="14" width="10" height="6" rx="2" fill="#e6e9ee"/></svg>
+        </div>
+        <h1 class="mission-title">浮空气球 · 解密工具</h1>
+      </div>
+      <div class="mission-sub">ENDFIELD BALLOON PUZZLE SOLVER</div>
+
+      <section class="task-block">
+        <h2 class="task-title"><i class="tick"></i>放置所有气球并保持平衡</h2>
+        <div class="task-item">· 气球放置位置</div>
+        <div class="task-item">· 拖拽移动气球，点击收回</div>
+      </section>
+
+      <section class="tool-block">
+        <h3 class="block-label">截图自动识别</h3>
+        <div class="btn-row" style="margin-bottom:0">
+          <button id="btn-upload" class="btn primary">📷 上传截图</button>
+          <button id="btn-clipboard" class="btn">📋 读剪贴板</button>
+        </div>
+        <input type="file" id="file-input" accept="image/*" hidden>
+        <p class="hint">支持 Ctrl+V 粘贴截图、把图片拖进页面，或点“读剪贴板”直接读取复制的截图。识别在本地完成，不会上传。</p>
+        <label class="checkline"><input type="checkbox" id="auto-solve" checked> 识别后自动求解</label>
+      </section>
+
+      <section class="tool-block">
+        <h3 class="block-label">求解</h3>
+        <div class="btn-row">
+          <button id="btn-solve" class="btn primary">▶ 自动求解</button>
+          <button id="btn-unique" class="btn">判断唯一解</button>
+        </div>
+        <div class="btn-row">
+          <button id="btn-clear" class="btn ghost">收回全部气球</button>
+          <button id="btn-overlay" class="btn ghost" hidden>识别标注</button>
+        </div>
+        <div class="vector-line">总向量 <span id="vector" class="vec zero">(0, 0)</span></div>
+        <div id="status" class="status">等待识别或手动摆放…</div>
+      </section>
+
+      <footer class="foot">非官方玩家工具，与鹰角网络无关。全部计算在浏览器本地完成。</footer>
+    </aside>
+
+    <!-- 中间：棋盘 -->
+    <main class="board-area">
+      <div class="counter">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="9" r="7" fill="#f2f4f8"/><rect x="9" y="15" width="6" height="5" rx="1.5" fill="#f2f4f8"/></svg>
+        <div class="counter-body">
+          <div class="counter-num"><span id="placed">0</span><span class="sep">/</span><span id="total">36</span></div>
+          <div class="counter-bar"><div id="bar" class="bar-fill"></div></div>
+        </div>
+      </div>
+      <div id="board" class="board" aria-label="气球棋盘"></div>
+      <div class="board-caption">· ─ 拖拽气球到格子 · 点击气球收回 · 右键格子切换启用/禁用 ─ ·</div>
+    </main>
+
+    <!-- 右侧：库存 -->
+    <aside class="panel right-panel">
+      <div class="inv-header">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="9" r="7" fill="#f2f4f8"/><rect x="9" y="15" width="6" height="5" rx="1.5" fill="#f2f4f8"/></svg>
+        <span>回收需使用全部气球</span>
+      </div>
+      <div id="inventory"></div>
+    </aside>
+  </div>
+  </div>
+
+  <!-- ===================== 页面二：设备修复（源石电路） ===================== -->
+  <div id="page-circuit" hidden>
+  <div class="app-grid" id="c-app">
+    <!-- 左侧：任务与控制 -->
+    <aside class="panel left-panel">
+      <div class="mission-header">
+        <div class="mission-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="#97e04c"/><rect x="13" y="3" width="8" height="8" rx="1.5" fill="#52b7ff"/><rect x="3" y="13" width="8" height="8" rx="1.5" fill="#3a4450"/><rect x="13" y="13" width="8" height="8" rx="1.5" fill="#97e04c" opacity=".55"/></svg>
+        </div>
+        <h1 class="mission-title">设备修复 · 电路模块</h1>
+      </div>
+      <div class="mission-sub">ENDFIELD ORIGINIUM CIRCUIT REPAIR</div>
+
+      <section class="task-block">
+        <h2 class="task-title"><i class="tick"></i>拖拽元件到网格内完成修复</h2>
+        <div class="task-item">· 每行/列点亮数 = 目标数字（绿/蓝分开计）</div>
+        <div class="task-item">· 灰 ⊘ 格不可放置，常亮锁定格已计入目标</div>
+      </section>
+
+      <section class="tool-block">
+        <h3 class="block-label">截图导入</h3>
+        <div class="btn-row" style="margin-bottom:0">
+          <button id="c-upload" class="btn primary">📷 上传截图</button>
+          <button id="c-clipboard" class="btn">📋 读剪贴板</button>
+          <button id="c-overlay" class="btn ghost" hidden>识别标注</button>
+        </div>
+        <input type="file" id="c-file-input" accept="image/*" hidden>
+        <label class="checkline" style="margin-top:8px"><input type="checkbox" id="c-force2"> 强制双色识别（蓝/绿数字成对显示的截图勾选）</label>
+        <p class="hint">支持 Ctrl+V 粘贴或拖入游戏截图。自动识别棋盘与行列目标（支持图形/数字、单色/双色），匹配官方关卡后一键求解；自动判断不准时勾选“强制双色”。</p>
+      </section>
+
+      <section class="tool-block">
+        <h3 class="block-label">官方关卡预设（109 道）</h3>
+        <input id="c-preset-search" class="c-input wide" type="search" placeholder="搜索关卡号 / 地点，如 V40020、发电站…" autocomplete="off">
+        <select id="c-preset" class="c-input wide" size="1"></select>
+        <label class="checkline"><input type="checkbox" id="c-auto-solve" checked> 载入预设后自动求解</label>
+        <p class="hint">涵盖 V4 系列（维序者区）、WL 系列（武陵区）与主线 / 据点 / 活动关卡。也可直接访问 <code>#V40020</code> 这样的链接直达。</p>
+      </section>
+
+      <section class="tool-block">
+        <h3 class="block-label">棋盘设置</h3>
+        <div class="c-field-row">
+          <label class="c-field">行 <input id="c-rows" class="c-input" type="number" min="1" max="10" value="5"></label>
+          <label class="c-field">列 <input id="c-cols" class="c-input" type="number" min="1" max="10" value="5"></label>
+          <button id="c-apply-size" class="btn small">应用尺寸</button>
+        </div>
+        <label class="checkline"><input type="checkbox" id="c-type2"> 启用蓝色组件（双目标模式）</label>
+      </section>
+
+      <section class="tool-block">
+        <h3 class="block-label">操作</h3>
+        <div class="btn-row">
+          <button id="c-solve" class="btn primary">▶ 自动求解</button>
+          <button id="c-rotate" class="btn">⟳ 旋转 (R)</button>
+        </div>
+        <div class="btn-row">
+          <button id="c-clear" class="btn ghost">清空摆放</button>
+          <button id="c-reset" class="btn ghost">重置棋盘</button>
+        </div>
+        <div id="c-status" class="status">载入预设或手动设置棋盘后求解。
+右键格子循环切换：空 → 禁用 ⊘ → 绿色锁定 → 蓝色锁定。</div>
+      </section>
+
+      <footer class="foot">非官方玩家工具，与鹰角网络无关。关卡数据参考社区解密计算器整理，全部计算在浏览器本地完成。</footer>
+    </aside>
+
+    <!-- 中间：电路棋盘 -->
+    <main class="board-area">
+      <div class="counter">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5" fill="#97e04c"/><rect x="13" y="4" width="7" height="7" rx="1.5" fill="#3a4450"/><rect x="4" y="13" width="7" height="7" rx="1.5" fill="#3a4450"/><rect x="13" y="13" width="7" height="7" rx="1.5" fill="#97e04c"/></svg>
+        <div class="counter-body">
+          <div class="counter-num"><span id="c-placed">0</span><span class="sep">/</span><span id="c-total">0</span></div>
+          <div class="counter-bar"><div id="c-bar" class="bar-fill"></div></div>
+        </div>
+      </div>
+      <div id="c-board-wrap"></div>
+      <div id="c-check" class="c-check"></div>
+      <div class="board-caption">· ─ 右键格子切换状态 · 点选元件后点棋盘放置 · 点击已放元件收回 · R 旋转 ─ ·</div>
+    </main>
+
+    <!-- 右侧：元件库 -->
+    <aside class="panel right-panel">
+      <div class="inv-header">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="#f2f4f8"/><rect x="13" y="5" width="8" height="6" rx="1.5" fill="#f2f4f8" opacity=".6"/><rect x="6" y="13" width="6" height="8" rx="1.5" fill="#f2f4f8" opacity=".6"/></svg>
+        <span>元件库（可旋转多联方块）</span>
+      </div>
+      <div id="c-palette"></div>
+    </aside>
+  </div>
+  </div>
+
+<div id="drop-hint" hidden><div class="drop-inner">松开以识别截图</div></div>
+
+<div id="overlay-modal" class="modal" hidden>
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>识别标注（绿=可放置 · 红=已放气球 · 灰框=禁用 · 黄圈=库存）</span>
+      <button id="btn-close-overlay" class="btn ghost small">关闭</button>
+    </div>
+    <div class="modal-body"><canvas id="overlay-canvas"></canvas></div>
+  </div>
+</div>
+
+<div id="c-overlay-modal" class="modal" hidden>
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>电路识别标注（绿框=空 · 灰框=禁用 · 青框=常亮 · 黄框=计数段）</span>
+      <button id="c-btn-close-overlay" class="btn ghost small">关闭</button>
+    </div>
+    <div class="modal-body"><canvas id="c-overlay-canvas"></canvas></div>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+<script type="module" src="js/circuit-app.js"></script>
+</body>
+</html>

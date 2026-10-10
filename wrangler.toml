@@ -1,0 +1,6 @@
+# Cloudflare Workers 配置：纯静态资源站点，所有计算在浏览器本地完成
+name = "endfield-balloon-solver"
+compatibility_date = "2025-01-01"
+
+[assets]
+directory = "./public"

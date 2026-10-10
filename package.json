@@ -1,0 +1,23 @@
+{
+  "name": "endfield-balloon-solver",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx wrangler dev",
+    "deploy": "npx wrangler deploy",
+    "pages:deploy": "npx wrangler pages deploy public",
+    "test:vision": "node tools/test-vision.mjs",
+    "test:vision2": "node tools/test-vision2.mjs",
+    "test:vision3": "node tools/test-vision3.mjs",
+    "test:solver": "node tools/test-solver.mjs",
+    "test:circuit": "node tools/test-circuit.mjs",
+    "test:circuit-pre": "node tools/test-circuit-preplaced.mjs",
+    "test:circuit-vision": "node tools/test-circuit-vision.mjs",
+    "test:circuit-digits": "node tools/test-circuit-digits.mjs",
+    "test:circuit-type2": "node tools/test-circuit-type2.mjs"
+  },
+  "devDependencies": {
+    "pngjs": "^7.0.0",
+    "wrangler": "^4.0.0"
+  }
+}

@@ -1,0 +1,5 @@
+node_modules/
+.wrangler/
+.workbuddy/
+.mimosa/
+tools/e2e/*.txt
