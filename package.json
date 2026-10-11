@@ -51,7 +51,7 @@
     },
     "compression": "maximum"
   },
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "《明日方舟：终末地》解密工具：浮空气球 & 源石电路（截图自动识别 + 求解，纯本地计算）",
   "author": "yss161"
 }

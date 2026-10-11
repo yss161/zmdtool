@@ -9,6 +9,12 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='4' y='4' width='11' height='11' rx='2' fill='%2397e04c'/><rect x='17' y='4' width='11' height='11' rx='2' fill='%2352b7ff'/><rect x='4' y='17' width='11' height='11' rx='2' fill='%23e8b23a'/><rect x='17' y='17' width='11' height='11' rx='2' fill='%235a6470'/></svg>">
 </head>
 <body data-mode="balloon">
+  <div id="update-banner" class="update-banner" hidden>
+    <span id="update-text">发现新版本</span>
+    <a id="update-link" href="https://github.com/yss161/zmdtool/releases" target="_blank" rel="noopener">查看更新</a>
+    <button id="update-dismiss" type="button" aria-label="关闭更新提示">✕</button>
+  </div>
+
   <!-- 顶部：模式切换（电路在前）+ 设置 -->
   <nav id="mode-tabs" aria-label="工具模式">
     <button type="button" class="mode-tab" data-mode="circuit">🧩 设备修复 · 源石电路</button>
@@ -18,6 +24,14 @@
     <div id="settings-pop" hidden>
       <div class="set-label">主题配色</div>
       <div id="theme-row" class="theme-row" role="group" aria-label="选择主题配色"></div>
+      <hr class="set-sep">
+      <div class="set-label">默认解密类型</div>
+      <select id="set-mode" class="c-input wide">
+        <option value="balloon">🎈 浮空气球</option>
+        <option value="circuit">🧩 设备修复 · 源石电路</option>
+      </select>
+      <div class="set-label desktop-only">窗口置顶（悬浮窗）</div>
+      <label class="checkline desktop-only"><input type="checkbox" id="set-ontop"> 始终显示在最上层</label>
     </div>
   </nav>
 
@@ -45,6 +59,7 @@
         <div class="btn-row" style="margin-bottom:0">
           <button id="btn-upload" class="btn primary">📷 上传截图</button>
           <button id="btn-clipboard" class="btn">📋 读剪贴板</button>
+          <button id="btn-screenshot" class="btn" hidden>🖥 截屏识别</button>
         </div>
         <input type="file" id="file-input" accept="image/*" hidden>
         <p class="hint">支持 Ctrl+V 粘贴截图、把图片拖进页面，或点“读剪贴板”直接读取复制的截图。识别在本地完成，不会上传。</p>
@@ -65,7 +80,7 @@
         <div id="status" class="status">等待识别或手动摆放…</div>
       </section>
 
-      <footer class="foot">非官方玩家工具，与鹰角网络无关。全部计算在浏览器本地完成。</footer>
+      <footer class="foot">非官方玩家工具，与鹰角网络无关。全部计算在浏览器本地完成。<span class="foot-meta">署名：yss161　·　<a href="https://github.com/yss161/zmdtool" target="_blank" rel="noopener">项目地址</a></span></footer>
     </aside>
 
     <!-- 中间：棋盘 -->
@@ -116,6 +131,7 @@
         <div class="btn-row" style="margin-bottom:0">
           <button id="c-upload" class="btn primary">📷 上传截图</button>
           <button id="c-clipboard" class="btn">📋 读剪贴板</button>
+          <button id="c-screenshot" class="btn" hidden>🖥 截屏识别</button>
           <button id="c-overlay" class="btn ghost" hidden>识别标注</button>
         </div>
         <input type="file" id="c-file-input" accept="image/*" hidden>
@@ -155,7 +171,7 @@
 右键格子循环切换：空 → 禁用 ⊘ → 绿色锁定 → 蓝色锁定。</div>
       </section>
 
-      <footer class="foot">非官方玩家工具，与鹰角网络无关。关卡数据参考社区解密计算器整理，全部计算在浏览器本地完成。</footer>
+      <footer class="foot">非官方玩家工具，与鹰角网络无关。关卡数据参考社区解密计算器整理，全部计算在浏览器本地完成。<span class="foot-meta">署名：yss161　·　<a href="https://github.com/yss161/zmdtool" target="_blank" rel="noopener">项目地址</a></span></footer>
     </aside>
 
     <!-- 中间：电路棋盘 -->
@@ -205,6 +221,17 @@
   </div>
 </div>
 
+<div id="capture-modal" class="modal" hidden>
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>选择要识别的屏幕</span>
+      <button id="capture-close" class="btn ghost small">取消</button>
+    </div>
+    <div class="modal-body"><div id="capture-list" class="capture-list"></div></div>
+  </div>
+</div>
+
+<script type="module" src="js/settings.js"></script>
 <script type="module" src="js/app.js"></script>
 <script type="module" src="js/circuit-app.js"></script>
 </body>

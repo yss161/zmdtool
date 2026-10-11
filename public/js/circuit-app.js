@@ -873,6 +873,7 @@ function setMode(mode) {
   localStorage.setItem("zmd-mode", mode);
   if (mode === "circuit") renderBoard();
 }
+window.setMode = setMode;
 document.querySelectorAll(".mode-tab").forEach(btn =>
   btn.addEventListener("click", () => setMode(btn.dataset.mode)));
 

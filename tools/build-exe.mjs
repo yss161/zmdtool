@@ -51,7 +51,7 @@ for (const sub of ["electron", "public"]) {
 }
 fs.writeFileSync(
   path.join(appRoot, "package.json"),
-  JSON.stringify({ name: "zmdtool", version: "1.0.0", main: "electron/main.cjs" }, null, 2)
+  JSON.stringify({ name: "zmdtool", version: "1.1.0", main: "electron/main.cjs" }, null, 2)
 );
 // exe 用英文名（SFX 自解压的 RunProgram 对中文路径编码兼容性差）
 const exeSrc = path.join(appDir, "electron.exe");
